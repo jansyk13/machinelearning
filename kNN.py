@@ -3,6 +3,7 @@ from numpy import *
 import operator
 
 import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 def create_data_set():
