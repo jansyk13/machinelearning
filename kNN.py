@@ -3,7 +3,7 @@ from numpy import *
 import operator
 
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 def create_data_set():
@@ -25,6 +25,16 @@ def classify0(inX, data, labels, k):
     sorted_class_count = sorted(class_count.iteritems(), key=operator.itemgetter(1), reverse=True)
     return sorted_class_count[0][0]
 
+def auto_norm(data):
+    min_vals = data.min(0)
+    max_vals = data.max(0)
+    ranges = max_vals - min_vals
+    norm_data = zeros(shape(data))
+    m = data.shape[0]
+    norm_data = data - tile(min_vals, (m,1))
+    norm_data = norm_data/tile(ranges, (m,1))
+    return norm_data, ranges, min_vals
+
 def file_2_matrix(path):
     # should be replaced by generator
     fr = open(path)
@@ -37,15 +47,15 @@ def file_2_matrix(path):
          line = line.strip()
          list_from_line = line.split('\t')
          return_mat[index,:] =  list_from_line[0:3]
-         class_label_vector.append(list_from_line[-1])
+         class_label_vector.append(int(list_from_line[-1]))
          index += 1
     return return_mat, class_label_vector
 
 def example_dating_site():
-    data, labels = file_2_matrix('datingTestSet.txt')
+    data, labels = file_2_matrix('datingTestSet2.txt')
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.scatter(data[:,1], data[:,2])
+    ax.scatter(data[:,1], data[:,2], 15.0*array(labels), 15.0*array(labels))
     plt.show()
 
 def example_A_B():
