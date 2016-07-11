@@ -51,6 +51,20 @@ def file_2_matrix(path):
          index += 1
     return return_mat, class_label_vector
 
+def example_dating_site_class_test():
+    ho_ratio = 0.10
+    data, labels = file_2_matrix('datingTestSet2.txt')
+    norm_data, ranges, min_vals = auto_norm(data)
+    m = norm_data.shape[0]
+    num_test_vec = int(m*ho_ratio)
+    error_count = 0.0
+    for i in range(num_test_vec):
+        classifier_result = classify0(norm_data[i,:], norm_data[num_test_vec:m,:], labels[num_test_vec:m], 3)
+        print "the classigier came back with: %d, the real answer is: %d" % (classifier_result, labels[i])
+        if (classifier_result != labels[i]): error_count += 1.0
+    print "the total error rate is: %f" % (error_count/float(num_test_vec))
+   
+
 def example_dating_site():
     data, labels = file_2_matrix('datingTestSet2.txt')
     fig = plt.figure()
@@ -63,6 +77,7 @@ def example_A_B():
     result = classify0([0,0], data, labels, 3)
     print result
 
-# example_A_B()
+example_dating_site_class_test()
 
-example_dating_site()
+# example_A_B()
+# example_dating_site()
