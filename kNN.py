@@ -77,7 +77,20 @@ def example_A_B():
     result = classify0([0,0], data, labels, 3)
     print result
 
-example_dating_site_class_test()
+def example_classify_person():
+    result_list = ['not at all', 'small doses', 'large doses']
+    input_array = array([
+                  float(raw_input('Percentage of time spent playing video games?')),
+                  float(raw_input('Frequent flier miles earend per year?')),
+                  float(raw_input('Liters of icecream consumed per year?'))
+                  ])
+    data, labels = file_2_matrix('datingTestSet2.txt')
+    norm_data, ranges, min_vals  = auto_norm(data)
+    norm_input = (input_array - min_vals)/ranges
+    classifier_result = classify0(norm_input, norm_data, labels, 3)
+    print result_list[classifier_result - 1]
 
+example_classify_person()
+# example_dating_site_class_test()
 # example_A_B()
 # example_dating_site()
