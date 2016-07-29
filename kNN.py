@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from numpy import *
+from os import listdir
 import operator
 
 import matplotlib
@@ -10,6 +11,7 @@ def create_data_set():
     group = array([[1.0,1.1],[1.0,1.0],[0,0],[0,0.1]])
     labels = ['A','A','B','B']
     return group, labels
+
 
 def classify0(inX, data, labels, k):
     data_size = data.shape[0]
@@ -25,6 +27,7 @@ def classify0(inX, data, labels, k):
     sorted_class_count = sorted(class_count.iteritems(), key=operator.itemgetter(1), reverse=True)
     return sorted_class_count[0][0]
 
+
 def auto_norm(data):
     min_vals = data.min(0)
     max_vals = data.max(0)
@@ -34,6 +37,7 @@ def auto_norm(data):
     norm_data = data - tile(min_vals, (m,1))
     norm_data = norm_data/tile(ranges, (m,1))
     return norm_data, ranges, min_vals
+
 
 def file_2_matrix(path):
     # should be replaced by generator
@@ -50,6 +54,7 @@ def file_2_matrix(path):
          class_label_vector.append(int(list_from_line[-1]))
          index += 1
     return return_mat, class_label_vector
+
 
 def example_dating_site_class_test():
     ho_ratio = 0.10
@@ -72,10 +77,12 @@ def example_dating_site():
     ax.scatter(data[:,1], data[:,2], 15.0*array(labels), 15.0*array(labels))
     plt.show()
 
+
 def example_A_B():
     data, labels = create_data_set()
     result = classify0([0,0], data, labels, 3)
     print result
+
 
 def example_classify_person():
     result_list = ['not at all', 'small doses', 'large doses']
@@ -90,7 +97,46 @@ def example_classify_person():
     classifier_result = classify0(norm_input, norm_data, labels, 3)
     print result_list[classifier_result - 1]
 
-example_classify_person()
+
+def img_2_vec(path):
+    vect = zeros((1,1024))
+    fr = open(path)
+    for i in range(32):
+        line = fr.readline()
+        for j in range(32):
+            vect[0,32*i+j]=int(line[j])
+    return vect
+
+
+def handwritting_to_class():
+    training_dir_list = listdir('trainingDigits')
+    training_dir_list_length = len(training_dir_list)
+    data = zeros((training_dir_list_length, 1024))
+    labels = []
+    for i in range(training_dir_list_length):
+        file_name = training_dir_list[i]
+        file_without_txt = file_name.split(".")[0]
+        test_number = file_without_txt.split("_")[0]
+        labels.append(test_number)
+        data[i,:] = img_2_vec('trainingDigits/%s' % file_name)
+    test_dir_list = listdir('testDigits')
+    test_dir_list_length = len(test_dir_list)
+    error_count = 0.0
+    for i in range(test_dir_list_length):
+        file_name = test_dir_list[i]
+        file_without_txt = file_name.split(".")[0]
+        under_test_number = int(file_without_txt.split("_")[0])
+        under_test_data = img_2_vec('testDigits/%s' % file_name)
+        result  = int(classify0(under_test_data, data, labels, 3))
+        print 'Real %d Guessed %d' % (under_test_number, result)
+        if (result != under_test_number): error_count += 1.0
+    print 'Error count %d' % error_count
+    print 'Error rate %f' % (error_count/float(test_dir_list_length)) 
+
+
+handwritting_to_class()
+
+# example_classify_person()
 # example_dating_site_class_test()
 # example_A_B()
 # example_dating_site()
