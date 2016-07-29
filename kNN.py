@@ -4,26 +4,27 @@ from os import listdir
 import operator
 
 import matplotlib
-#matplotlib.use('TkAgg')
+# matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+
 def create_data_set():
-    group = array([[1.0,1.1],[1.0,1.0],[0,0],[0,0.1]])
-    labels = ['A','A','B','B']
+    group = array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])
+    labels = ['A', 'A', 'B', 'B']
     return group, labels
 
 
 def classify0(inX, data, labels, k):
     data_size = data.shape[0]
-    diff_mat = tile(inX, (data_size,1)) - data
-    sq_diff_mat = diff_mat**2
+    diff_mat = tile(inX, (data_size, 1)) - data
+    sq_diff_mat = diff_mat ** 2
     sq_distance = sq_diff_mat.sum(axis=1)
-    distances = sq_distance**0.5
+    distances = sq_distance ** 0.5
     sorted_dist_indicies = distances.argsort()
     class_count = {}
     for i in range(k):
-         vote_I_label = labels[sorted_dist_indicies[i]]
-         class_count[vote_I_label] = class_count.get(vote_I_label, 0) + 1
+        vote_I_label = labels[sorted_dist_indicies[i]]
+        class_count[vote_I_label] = class_count.get(vote_I_label, 0) + 1
     sorted_class_count = sorted(class_count.iteritems(), key=operator.itemgetter(1), reverse=True)
     return sorted_class_count[0][0]
 
@@ -34,8 +35,8 @@ def auto_norm(data):
     ranges = max_vals - min_vals
     norm_data = zeros(shape(data))
     m = data.shape[0]
-    norm_data = data - tile(min_vals, (m,1))
-    norm_data = norm_data/tile(ranges, (m,1))
+    norm_data = data - tile(min_vals, (m, 1))
+    norm_data = norm_data / tile(ranges, (m, 1))
     return norm_data, ranges, min_vals
 
 
@@ -48,11 +49,11 @@ def file_2_matrix(path):
     fr = open(path)
     index = 0
     for line in fr.readlines():
-         line = line.strip()
-         list_from_line = line.split('\t')
-         return_mat[index,:] =  list_from_line[0:3]
-         class_label_vector.append(int(list_from_line[-1]))
-         index += 1
+        line = line.strip()
+        list_from_line = line.split('\t')
+        return_mat[index, :] = list_from_line[0:3]
+        class_label_vector.append(int(list_from_line[-1]))
+        index += 1
     return return_mat, class_label_vector
 
 
@@ -61,50 +62,50 @@ def example_dating_site_class_test():
     data, labels = file_2_matrix('datingTestSet2.txt')
     norm_data, ranges, min_vals = auto_norm(data)
     m = norm_data.shape[0]
-    num_test_vec = int(m*ho_ratio)
+    num_test_vec = int(m * ho_ratio)
     error_count = 0.0
     for i in range(num_test_vec):
-        classifier_result = classify0(norm_data[i,:], norm_data[num_test_vec:m,:], labels[num_test_vec:m], 3)
+        classifier_result = classify0(norm_data[i, :], norm_data[num_test_vec:m, :], labels[num_test_vec:m], 3)
         print "the classigier came back with: %d, the real answer is: %d" % (classifier_result, labels[i])
         if (classifier_result != labels[i]): error_count += 1.0
-    print "the total error rate is: %f" % (error_count/float(num_test_vec))
-   
+    print "the total error rate is: %f" % (error_count / float(num_test_vec))
+
 
 def example_dating_site():
     data, labels = file_2_matrix('datingTestSet2.txt')
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.scatter(data[:,1], data[:,2], 15.0*array(labels), 15.0*array(labels))
+    ax.scatter(data[:, 1], data[:, 2], 15.0 * array(labels), 15.0 * array(labels))
     plt.show()
 
 
 def example_A_B():
     data, labels = create_data_set()
-    result = classify0([0,0], data, labels, 3)
+    result = classify0([0, 0], data, labels, 3)
     print result
 
 
 def example_classify_person():
     result_list = ['not at all', 'small doses', 'large doses']
     input_array = array([
-                  float(raw_input('Percentage of time spent playing video games?')),
-                  float(raw_input('Frequent flier miles earend per year?')),
-                  float(raw_input('Liters of icecream consumed per year?'))
-                  ])
+        float(raw_input('Percentage of time spent playing video games?')),
+        float(raw_input('Frequent flier miles earend per year?')),
+        float(raw_input('Liters of icecream consumed per year?'))
+    ])
     data, labels = file_2_matrix('datingTestSet2.txt')
-    norm_data, ranges, min_vals  = auto_norm(data)
-    norm_input = (input_array - min_vals)/ranges
+    norm_data, ranges, min_vals = auto_norm(data)
+    norm_input = (input_array - min_vals) / ranges
     classifier_result = classify0(norm_input, norm_data, labels, 3)
     print result_list[classifier_result - 1]
 
 
 def img_2_vec(path):
-    vect = zeros((1,1024))
+    vect = zeros((1, 1024))
     fr = open(path)
     for i in range(32):
         line = fr.readline()
         for j in range(32):
-            vect[0,32*i+j]=int(line[j])
+            vect[0, 32 * i + j] = int(line[j])
     return vect
 
 
@@ -118,7 +119,7 @@ def handwritting_to_class():
         file_without_txt = file_name.split(".")[0]
         test_number = file_without_txt.split("_")[0]
         labels.append(test_number)
-        data[i,:] = img_2_vec('trainingDigits/%s' % file_name)
+        data[i, :] = img_2_vec('trainingDigits/%s' % file_name)
     test_dir_list = listdir('testDigits')
     test_dir_list_length = len(test_dir_list)
     error_count = 0.0
@@ -127,11 +128,11 @@ def handwritting_to_class():
         file_without_txt = file_name.split(".")[0]
         under_test_number = int(file_without_txt.split("_")[0])
         under_test_data = img_2_vec('testDigits/%s' % file_name)
-        result  = int(classify0(under_test_data, data, labels, 3))
+        result = int(classify0(under_test_data, data, labels, 3))
         print 'Real %d Guessed %d' % (under_test_number, result)
         if (result != under_test_number): error_count += 1.0
     print 'Error count %d' % error_count
-    print 'Error rate %f' % (error_count/float(test_dir_list_length)) 
+    print 'Error rate %f' % (error_count / float(test_dir_list_length))
 
 
 handwritting_to_class()
